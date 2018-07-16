@@ -1,0 +1,95 @@
+type PropertyOutput {
+    productProperty: Int!
+    propertyValue: String
+    unit: Int!
+}
+
+type Product {
+    createdAt: String!
+    title: String!
+    description: String!
+    id: Int
+    price: Int!
+    properties: [PropertyOutput]
+    sku: String!
+    shortDescription: String
+    comments: [Comment]
+}
+
+input PropertyInput {
+    productProperty: Int!
+    propertyValue: String
+    unit: Int!
+}
+
+# Input for addProduct Mutation
+input AddProductInput {
+    title: String!
+    description: String!
+    price: Int!
+    shortDescription: String!
+    sku: String!
+    properties: [PropertyInput]
+}
+
+# Input for editProduct Mutation
+input EditProductInput {
+    id: Int
+    title: String!
+    description: String!
+    price: Int!
+}
+
+# Edges for ProductsQuery
+type ProductEdges {
+    node: Product
+    cursor: Int!
+}
+
+# PageInfo for ProductsQuery
+type PageInfo {
+    endCursor: Int!
+    hasNextPage: Boolean
+}
+
+# Products relay-style pagination query
+type ProductsQuery {
+    totalCount: Int
+    edges: [ProductEdges]
+    pageInfo: PageInfo
+}
+
+# Payload for productsUpdated Subscription
+type UpdateProductsPayload {
+    mutation: String!
+    node: Product
+}
+
+# Payload for productUpdated Subscription
+type UpdateProductPayload {
+    mutation: String!
+    node: Product
+}
+
+extend type Query {
+    # Product
+   product(id: Int): Product
+    # Products pagination query
+   productsQuery(limit: Int, offset: Int): ProductsQuery
+}
+
+extend type Mutation {
+    # Create new Product
+    addProduct(input: AddProductInput!): Product
+    # Delete a Product
+    deleteProduct(id: Int): Int
+    # Edit a Product
+    editProduct(input: EditProductInput!): Product
+}
+
+extend type Subscription {
+    # Subscription for when editing a product
+    productUpdated(id: Int): UpdateProductPayload
+    # Subscription for products list
+    productsUpdated(endCursor: Int): UpdateProductsPayload
+}
